@@ -1,10 +1,14 @@
-import { titleFont } from "@/config/fonts";
+import { ProductGrid, Title } from "@/components";
+import { initialData } from "@/seed/seed";
 
 export default function Home() {
+
+  const products = initialData.products;
+
   return (
     <>
-      <h1>Hola mundo</h1>
-      <h2 className={`${titleFont.className} font-bold`}>Hola mundo</h2>
+      <Title title="Tienda" subTilte="Todos los productos" className="mb-2" />
+      <ProductGrid products={products}/>
     </>
   );
 }

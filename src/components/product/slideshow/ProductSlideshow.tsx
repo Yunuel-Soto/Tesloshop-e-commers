@@ -8,6 +8,7 @@ import 'swiper/css/free-mode';
 import 'swiper/css/navigation';
 import 'swiper/css/thumbs';
 import './slideshow.css'
+import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
 
 interface Props {
     images: string[];

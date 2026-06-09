@@ -50,7 +50,6 @@ export default function () {
             }
           </div>
 
-
           {/* Checkout */}
 
           <div className="bg-white rounded-xl shadow-xl p-7 h-fit">

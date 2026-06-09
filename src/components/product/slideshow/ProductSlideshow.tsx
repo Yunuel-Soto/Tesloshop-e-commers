@@ -8,7 +8,8 @@ import 'swiper/css/free-mode';
 import 'swiper/css/navigation';
 import 'swiper/css/thumbs';
 import './slideshow.css'
-import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
+import { Autoplay, FreeMode, Navigation, Thumbs } from 'swiper/modules';
+import Image from 'next/image';
 
 interface Props {
     images: string[];
@@ -28,40 +29,39 @@ export const ProductSlideshow = ({ images, title, className }: Props) => {
                 } as React.CSSProperties}
                 spaceBetween={10}
                 navigation={true}
+                autoplay={
+                    {
+                        delay: 2500
+                    }
+                }
                 thumbs={{ swiper: thumbsSwiper }}
-                modules={[FreeMode, Navigation, Thumbs]}
+                modules={[FreeMode, Navigation, Thumbs, Autoplay]}
                 className="mySwiper2"
             >
-                <SwiperSlide>
-                    <img src="https://swiperjs.com/demos/images/abstract-1.jpg" />
-                </SwiperSlide>
-                <SwiperSlide>
-                    <img src="https://swiperjs.com/demos/images/abstract-2.jpg" />
-                </SwiperSlide>
-                <SwiperSlide>
-                    <img src="https://swiperjs.com/demos/images/abstract-3.jpg" />
-                </SwiperSlide>
-                <SwiperSlide>
-                    <img src="https://swiperjs.com/demos/images/abstract-4.jpg" />
-                </SwiperSlide>
-                <SwiperSlide>
-                    <img src="https://swiperjs.com/demos/images/abstract-5.jpg" />
-                </SwiperSlide>
-                <SwiperSlide>
-                    <img src="https://swiperjs.com/demos/images/abstract-6.jpg" />
-                </SwiperSlide>
-                <SwiperSlide>
-                    <img src="https://swiperjs.com/demos/images/abstract-7.jpg" />
-                </SwiperSlide>
-                <SwiperSlide>
-                    <img src="https://swiperjs.com/demos/images/abstract-8.jpg" />
-                </SwiperSlide>
-                <SwiperSlide>
-                    <img src="https://swiperjs.com/demos/images/abstract-9.jpg" />
-                </SwiperSlide>
-                <SwiperSlide>
-                    <img src="https://swiperjs.com/demos/images/abstract-10.jpg" />
-                </SwiperSlide>
+                {
+                    images.map(image => (
+                        <SwiperSlide key={image}>
+                            <Image src={`/products/${image}`} alt={title} width={'1024'} height={'800'} className='rounded-lg object-fill' />
+                        </SwiperSlide>
+                    ))
+                }
+            </Swiper>
+            <Swiper
+                onSwiper={setThumbsSwiper}
+                spaceBetween={10}
+                slidesPerView={4}
+                freeMode={true}
+                watchSlidesProgress={true}
+                modules={[FreeMode, Navigation, Thumbs]}
+                className="mySwiper"
+            >       
+                {
+                    images.map(image => (
+                        <SwiperSlide key={image}>
+                            <Image alt={title} src={`/products/${image}`} width={300} height={300} className='rounded-lg object-fill'/>
+                        </SwiperSlide>
+                    ))
+                }    
             </Swiper>
         </div>
     );

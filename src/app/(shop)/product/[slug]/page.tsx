@@ -1,8 +1,11 @@
-import { QuantitySelector, SizeSelector, ProductSlideshow } from "@/components";
+export const revalidate = 604800; //revalidar en 7 dias
+
+import { QuantitySelector, SizeSelector, ProductSlideshow, StockLabel } from "@/components";
 import { titleFont } from "@/config/fonts";
-import { initialData } from "@/seed/seed";
 import { notFound } from "next/navigation";
 import { ProductMobileSlideshow } from '../../../../components/product/slideshow/ProductMobileSlideshow';
+import { getProductBySlog } from "@/actions";
+import { Metadata, ResolvingMetadata } from "next";
 
 interface Props {
   params: {
@@ -10,10 +13,30 @@ interface Props {
   }
 }
 
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const slug = (await params).slug
+ 
+  // fetch post information
+  const product = await getProductBySlog(slug);
+ 
+  return {
+    title: product?.title ?? 'Producto no encontrado',
+    description: product?.description ?? '',
+    openGraph: {
+      title: product?.title ?? 'Producto no encontrado',
+      description: product?.description ?? '',
+      images: [`/products/${product?.images[1]}`]
+    }
+  }
+}
+
 export default async function ({ params }: Props) {
 
   const { slug } = await params;
-  const product = initialData.products.find(product => product.slug === slug);
+  const product = await getProductBySlog(slug);
 
   if (!product) {
     notFound();
@@ -42,6 +65,8 @@ export default async function ({ params }: Props) {
 
       {/* details */}
       <div className="col-span-1 px-5">
+        <StockLabel slug={slug} />
+
         <h1 className={`${titleFont.className} antialiased font-bold text-xl`}>
           {product.title}
         </h1>

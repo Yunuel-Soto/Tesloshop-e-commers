@@ -59,7 +59,7 @@ export default async function ({ params }: Props) {
         <ProductSlideshow
           images={product.images}
           title={product.title}
-          className="hidden md:block"
+          className="hidden md:block h-[70vh]"
         />
       </div>
 

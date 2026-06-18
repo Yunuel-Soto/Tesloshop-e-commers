@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { ProductMobileSlideshow } from '../../../../components/product/slideshow/ProductMobileSlideshow';
 import { getProductBySlog } from "@/actions";
 import { Metadata, ResolvingMetadata } from "next";
+import AddToCart from "./ui/AddToCart";
 
 interface Props {
   params: {
@@ -72,16 +73,7 @@ export default async function ({ params }: Props) {
         </h1>
         <p className="text-lg mb-5">{product.price}</p>
         
-        {/* Selector de tallas */}
-        <SizeSelector selectedSize={product.sizes[1]} availableSizes={product.sizes}/>
-
-        {/* selector de cantidad */}
-        <QuantitySelector quantity={2}/>
-
-        {/* Button */}
-        <button className="btn-primary my-5">
-          Agregar al carrito
-        </button>
+        <AddToCart product={product}/>
 
         {/* Description */}
         <h3 className="font-bold text-sm">Descripcion</h3>

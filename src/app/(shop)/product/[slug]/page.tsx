@@ -1,6 +1,6 @@
 export const revalidate = 604800; //revalidar en 7 dias
 
-import { QuantitySelector, SizeSelector, ProductSlideshow, StockLabel } from "@/components";
+import { ProductSlideshow, StockLabel } from "@/components";
 import { titleFont } from "@/config/fonts";
 import { notFound } from "next/navigation";
 import { ProductMobileSlideshow } from '../../../../components/product/slideshow/ProductMobileSlideshow';

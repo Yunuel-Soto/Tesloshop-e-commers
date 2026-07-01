@@ -1,13 +1,27 @@
 'use client'
+import { logout } from "@/actions";
 import { useUIStore } from "@/store";
 import clsx from "clsx";
 import Link from "next/link"
+import { useSession } from 'next-auth/react';
+
 import { IoCloseOutline, IoLogInOutline, IoLogOutOutline, IoPeopleOutline, IoPersonOutline, IoSearchOutline, IoShareOutline, IoTicketOutline } from "react-icons/io5"
 
 export const Sidebar = () => {
 
     const isSideMenuOpen = useUIStore(state => state.isSideMenuOpen);
     const closeMenu = useUIStore(state => state.closeSideMenu);
+
+    /**
+     * Para validar si el usuario esta logeado o no de forma efectiva, se tiene que evaluar con el
+     * hook useSession de next-auth/react para no tener que refrescar el navegador al cerrar sesion.
+     * 
+     * Para que funcione hay que envolver toda la aplicacion en el provider SessionProvider. En este caso
+     * se hizo creando un componente llamado Provider en el se coloco SessionProvider, para que asi
+     * si tenemos mas providers, los pongamos ahi y en el layout solo usemos el componente Provider
+     */
+    const { data: session } = useSession(); 
+    const isAuthenticated = !!session?.user;
 
     return (
         <div>
@@ -53,7 +67,8 @@ export const Sidebar = () => {
 
                 {/* options menu */}
                 <Link
-                    href={'/'}
+                    href={'/profile'}
+                    onClick={() => closeMenu()}
                     className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
                 >
                     <IoPersonOutline size={30} />
@@ -66,20 +81,34 @@ export const Sidebar = () => {
                     <IoTicketOutline size={30} />
                     <span className="ml-3 text-xl">Ordenes</span>
                 </Link>
-                <Link
-                    href={'/'}
-                    className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
-                >
-                    <IoLogInOutline size={30} />
-                    <span className="ml-3 text-xl">Ingresar</span>
-                </Link>
-                <Link
-                    href={'/'}
-                    className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
-                >
-                    <IoLogOutOutline size={30} />
-                    <span className="ml-3 text-xl">Salir</span>
-                </Link>
+                {
+                    isAuthenticated && (
+                        <button    
+                            onClick={() => {
+                                logout()
+                                closeMenu()
+                            }}    
+                            className="flex w-full items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
+                        >
+                            <IoLogOutOutline size={30} />
+                            <span className="ml-3 text-xl">Salir</span>
+                        </button>
+                    )
+                }
+
+                {
+                    !isAuthenticated && (
+                        <Link
+                            href={'/auth/login'}
+                            onClick={() => closeMenu()}
+                            className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
+                        >
+                            <IoLogInOutline size={30} />
+                            <span className="ml-3 text-xl">Ingresar</span>
+                        </Link>
+                    )
+                }                
+                
 
                 {/* Line separator */}
                 <div className="w-full my-10 h-px bg-gray-200"></div>

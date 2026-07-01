@@ -1,23 +1,25 @@
 'use server'
 
 import { signIn } from '@/auth.config';
-import { AuthError } from 'next-auth';
-import { isRedirectError } from 'next/dist/client/components/redirect-error';
- 
-// ...
  
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData,
 ) {
   try {
-    
-    await signIn('credentials', Object.fromEntries(formData));
+    await signIn('credentials', {
+      ...Object.fromEntries(formData),
+      redirect: false,
+    });
+
+    return 'Success';
       
   } catch (error) {
-    if (isRedirectError(error)) {
-      throw error;
+
+    if ((error as any).type === 'CredentialsSignin') {
+      return 'CredentialsSignin'; 
     }
-    return 'Invalid credentials'
+
+    return 'UnknownError'; 
   }
 }

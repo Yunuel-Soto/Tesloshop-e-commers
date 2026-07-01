@@ -1,12 +1,21 @@
 'use client'
 import { authenticate } from '@/actions'
+import clsx from 'clsx'
 import Link from 'next/link'
-import { useActionState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useActionState, useEffect } from 'react'
+import { useFormStatus } from 'react-dom'
+import { IoInformationOutline } from 'react-icons/io5'
 
 export const LoginForm = () => {
-  // const [state, dispatch] = useFormState(authenticate, undefined);
   const [state, dispatch, isPending] = useActionState(authenticate, undefined);
-  console.log(state);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state === 'Success') {
+      router.replace('/');
+    }
+  }, [state])
 
   return (
     <form action={dispatch} className="flex flex-col">
@@ -25,11 +34,22 @@ export const LoginForm = () => {
         name='password'
       />
 
-      <button
-        type="submit"
-        className="btn-primary">
-        Ingresar
-      </button>
+      <div
+        className='flex h-8 items-end space-x-1'
+        aria-live='polite'
+        aria-atomic="true"
+      >
+        {
+          state === 'CredentialsSignin' && (
+            <div className='mb-3 flex'>
+              <IoInformationOutline className="h-5 w-5 text-red-500" />
+              <p className='text-sm text-red-500'>Credenciales invalidas</p>
+            </div>
+          )
+        }
+      </div>
+
+      <LoginBtton/>
 
       {/* divisor l ine */}
       <div className="flex items-center my-5">
@@ -45,5 +65,22 @@ export const LoginForm = () => {
       </Link>
 
     </form>
+  )
+}
+
+function LoginBtton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      type="submit"
+      className={clsx({
+        "btn-primary": !pending,
+        "btn-disabled": pending,
+      })}
+      disabled={pending}
+    >
+      Ingresar 
+    </button>
   )
 }

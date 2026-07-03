@@ -20,7 +20,6 @@ export const authConfig : NextAuthConfig = {
         },  
 
         async session({session, token}) {
-            console.log({ session, token });
             session.user = token.data as any;
             // validar si el usuario esta activo en la base de datos aqui
             return session;

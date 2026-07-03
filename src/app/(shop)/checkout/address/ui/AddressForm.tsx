@@ -1,6 +1,11 @@
 'use client'
-import { Country } from '@/interfaces';
+import { deleteUserAddress, setUserAddress } from '@/actions';
+import { Address, Country } from '@/interfaces';
+import { useAddressStore } from '@/store';
 import clsx from 'clsx';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form'
 
 type FormInputs = {
@@ -16,24 +21,53 @@ type FormInputs = {
 }
 
 interface Props {
-    countries: Country[]
+    countries: Country[],
+    userStoredAddress?: Partial<Address>
+    // El partial le indica a ts que todas las propiedades son opcionales
 }
 
-const AddressForm = ({countries} : Props) => {
+const AddressForm = ({countries, userStoredAddress = {}} : Props) => {
 
-    const { handleSubmit, register, formState: { isValid } } = useForm<FormInputs>({
+    const router = useRouter();
+
+    const { handleSubmit, register, formState: { isValid, errors }, reset } = useForm<FormInputs>({
         defaultValues: {
-            // TODO: LEER DE LA BASE DE DATOS
+            ...(userStoredAddress) as any,
+            remmeberAddres: true,
         }
+    });    
+
+    const { data: session } = useSession({
+        required: true
     });
 
-    const onSubmit = (data: FormInputs) => {
-        console.log(data);
+    const user = session?.user;
+
+    const setAddress = useAddressStore(state => state.setAddress);    
+    const address = useAddressStore(state => state.address);    
+    
+    const onSubmit = async (data: FormInputs) => {
+        await setAddress(data);
+
+        if (data.remmeberAddres) {
+            const {remmeberAddres, ...rest } = data;
+            await setUserAddress(rest, user!.id);
+        } else {
+            await deleteUserAddress(user!.id);
+        }
+
+        router.push('/checkout');
     }
 
-    return (
-        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2">
+    useEffect(() => {
+        console.log(address);
+        if (address.firstName) {
+            reset(address);
+        }
+    }, [])
 
+    return (
+        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2">            
             <div className="flex flex-col mb-2">
                 <span>Nombres</span>
                 <input
@@ -41,8 +75,7 @@ const AddressForm = ({countries} : Props) => {
                     className="p-2 border rounded-md bg-gray-200"
                     {...register('firstName', {required: true})}
                 />
-            </div>
-
+            </div>            
             <div className="flex flex-col mb-2">
                 <span>Apellidos</span>
                 <input
@@ -147,7 +180,7 @@ const AddressForm = ({countries} : Props) => {
                 </div>
                 <button
                     type='submit'
-                    disabled={isValid}
+                    disabled={!isValid}
                     className={clsx({
                         'btn-primary': isValid,
                         'btn-disabled': !isValid

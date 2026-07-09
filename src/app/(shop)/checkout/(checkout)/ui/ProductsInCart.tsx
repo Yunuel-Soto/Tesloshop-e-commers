@@ -3,26 +3,26 @@
 import { useCartStore } from "@/store"
 import { currencyFormat } from "@/utils";
 import Image from "next/image";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export const ProductsInCart = () => {
     const [loaded, setLoaded] = useState(false);
     const productsInCart = useCartStore(state => state.cart);
-
+    const router = useRouter();   
+    
     useEffect(() => {
         setLoaded(true);
-    }, [])
 
-    useEffect(() => {
         if (productsInCart.length === 0) {
-            redirect('/empty');
+            router.replace('/empty');
         }
-    }, [productsInCart])
+        
+    }, [productsInCart, router])
 
-    if (!loaded) {
+    if (!loaded || productsInCart.length === 0) {
         return <p>Loading...</p>
-    }        
+    }   
     
     return (
         <>
@@ -43,7 +43,7 @@ export const ProductsInCart = () => {
 
                         <div>
                             <span>
-                                {product.size} - {product.title} {product.quantity}
+                                {product.size} - {product.title} ({product.quantity})
                             </span>
 
                             <p className="font-bold">{currencyFormat(product.price * product.quantity)}</p>                                                        

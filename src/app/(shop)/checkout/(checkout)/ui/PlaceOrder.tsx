@@ -1,20 +1,26 @@
 'use client'
 
+import { placeOrder } from "@/actions";
 import { useAddressStore, useCartStore } from "@/store";
 import { currencyFormat } from "@/utils";
+import { ok } from "assert";
 import clsx from "clsx";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react"
 import { useShallow } from "zustand/shallow";
 
 const PlaceOrder = () => {
+    const router = useRouter();
 
     const [loaded, setLoaded] = useState(false);
     const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const address = useAddressStore(state => state.address);
 
     const { subTotal, tax, total, itemsInCart } = useCartStore(useShallow(state => state.getSummaryInformation()));    
     const cart = useCartStore(state => state.cart);
+    const clearCart = useCartStore(state => state.clearCart);
 
     useEffect(() => {
         setLoaded(true)
@@ -30,9 +36,17 @@ const PlaceOrder = () => {
             size: product.size
         }));
 
-        console.log({ address, productsInOrder });
+        const res = await placeOrder(productsInOrder, address);
 
+        if (!res.ok) {
+            setIsPlacingOrder(false);
+            setErrorMessage(res.message);
+            return;
+        }
+        
         setIsPlacingOrder(false);
+        clearCart();
+        router.replace('/orders/' + res.order);
     }
 
 
@@ -80,7 +94,7 @@ const PlaceOrder = () => {
                     </span>
                 </p>
 
-                {/* <p className="text-red-500">Error de creacion</p> */}
+                <p className="text-red-500">{errorMessage}</p>
 
                 <button
                     className={

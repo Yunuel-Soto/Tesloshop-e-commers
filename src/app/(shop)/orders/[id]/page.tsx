@@ -1,11 +1,10 @@
 import { getOrderById } from "@/actions/order/get-order-by-id";
 import { Title } from "@/components";
-import { initialData } from "@/seed/seed";
+import OrderStatus from "@/components/orders/OrderStatus";
+import PayPalButton from "@/components/paypal/PayPalButton";
 import { currencyFormat } from "@/utils";
-import clsx from "clsx";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { IoCardOutline } from 'react-icons/io5';
 
 interface Props {
   params: {
@@ -17,7 +16,7 @@ export default async function ({ params }: Props) {
 
   const { id } = await params;
 
-  const { order, totalItems, subTotal, tax, total, ok } = await getOrderById(id);
+  const { order, totalItems, ok } = await getOrderById(id);
 
   if (!order || !ok) {
     redirect('/');
@@ -35,19 +34,7 @@ export default async function ({ params }: Props) {
           {/* Carrito */}
           <div className="flex flex-col mt-5">
 
-            <div className={
-              clsx(
-                "flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5",
-                {
-                  'bg-red-500': !order.isPaid,
-                  'bg-green-700': order.isPaid
-                }
-              )
-            }>
-              <IoCardOutline size={30} />
-              <span className="mx-2">{order.isPaid ? 'Pagado' : 'Pendiente de pago'}</span>
-            </div>
-
+            <OrderStatus isPaid={order.isPaid} />
 
             {/* Items */}
             {
@@ -102,29 +89,23 @@ export default async function ({ params }: Props) {
               <span className="text-right">{totalItems === 1 ? '1 arcitulo' : `${totalItems} articulos`}</span>
 
               <span>Subtotal</span>
-              <span className="text-right">{currencyFormat(subTotal!)}</span>
+              <span className="text-right">{currencyFormat(order.subtTotal!)}</span>
 
               <span>Impuestos (15%)</span>
-              <span className="text-right">{currencyFormat(tax)}</span>
+              <span className="text-right">{currencyFormat(order.tax)}</span>
 
               <span className="mt-5 text-2xl">Total</span>
-              <span className="mt-5 text-2xl text-right">{currencyFormat(total)}</span>
+              <span className="mt-5 text-2xl text-right">{currencyFormat(order.total)}</span>
             </div>
 
-            <div className="mt-5 mb-2 w-full">
-
-              <div className={
-                clsx(
-                  "flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5",
-                  {
-                    'bg-red-500': !order.isPaid,
-                    'bg-green-700': order.isPaid
-                  }
+            <div className="mt-5 mb-2 w-full">  
+              {
+                order.isPaid ? (
+                  <OrderStatus isPaid={order.isPaid} />
+                ) : (
+                  <PayPalButton amount={order.total} orderId={order.id} />                                  
                 )
-              }>
-                <IoCardOutline size={30} />
-                <span className="mx-2">{order.isPaid ? 'Pagado' : 'Pendiente de pago'}</span>
-              </div>
+              }
             </div>
           </div>
         </div>

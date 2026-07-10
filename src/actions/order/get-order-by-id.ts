@@ -47,18 +47,12 @@ export const getOrderById = async (id: string) => {
             }
         }
     
-        const totalItems = order?.orderItems.reduce((count, item) => count + item.quantity, 0);
-        const subTotal = order?.orderItems.reduce((count, item) => count + item.price, 0);
-        const tax = subTotal! * 0.15;
-        const total = subTotal! * 1.15;
+        const totalItems = order?.orderItems.reduce((count, item) => count + item.quantity, 0);       
     
         return {
             ok: true,
             order: order,
-            totalItems: totalItems,
-            subTotal: subTotal,
-            tax: tax,
-            total: total
+            totalItems: totalItems,          
         };
     } catch (error) {
         console.log(error);

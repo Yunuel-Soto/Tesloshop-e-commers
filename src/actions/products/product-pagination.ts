@@ -35,6 +35,7 @@ export const getPaginatedProductsWithImages = async ({page = 1, take = 12, gende
                 gender: gender
             }
         });
+        
         const totalPages = Math.ceil(totalCount / take);
 
         return {

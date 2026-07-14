@@ -11,9 +11,13 @@ export const authConfig : NextAuthConfig = {
     },
     callbacks: {
         
-        jwt({ token, user }) {
+        jwt({ token, user, trigger, session }) {
             if (user) {
                 token.data = user;
+            }
+
+            if (trigger === 'update' && session?.role) {
+                token.role = session.role
             }
 
             return token;
@@ -21,7 +25,10 @@ export const authConfig : NextAuthConfig = {
 
         async session({session, token}) {
             session.user = token.data as any;
-            // validar si el usuario esta activo en la base de datos aqui
+            if (session.user && token.role) {
+                session.user.role = token.role as string;
+            }
+
             return session;
         },
     },

@@ -1,4 +1,5 @@
 'use client'
+import { changeUserRole } from '@/actions'
 import { User } from '@/interfaces'
 import Link from 'next/link'
 import { IoCardOutline } from 'react-icons/io5'
@@ -38,7 +39,7 @@ const DataTable = ({ users }: Props) => {
                                     <select
                                         className='text-sm text-gray-900 w-full p-2'
                                         value={user.role}
-                                        onChange={e => console.log(e.target.value)}
+                                        onChange={e => changeUserRole(user.id, e.target.value)}
                                         name=""
                                         id=""
                                     >

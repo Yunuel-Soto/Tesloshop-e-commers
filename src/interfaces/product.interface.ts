@@ -12,6 +12,24 @@ export interface Product {
     gender: Catogory
 }
 
+export interface ProductWImages {
+    id: string
+    description: string;
+    inStock: number;
+    price: number;
+    sizes: Size[];
+    slug: string;
+    tags: string[];
+    title: string;
+    gender: Catogory;
+    productImages: ProductImage[];
+}
+
+interface ProductImage {
+    url: string;
+    id: number;
+}
+
 export interface CartProduct {
     id: string;
     slug: string;
